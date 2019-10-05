@@ -13,6 +13,7 @@ def main():
     parser.add_argument('--keystone-user', required=True, dest='user')
     parser.add_argument('--keystone-password', required=True, dest='password')
     parser.add_argument('--keystone-project', required=True, dest='project')
+    parser.add_argument('--keystone-projectid', required=True, dest='projectid')
     parser.add_argument('--keystone-url', required=True, dest='url')
     args = parser.parse_args()
 
@@ -20,7 +21,7 @@ def main():
                        username=args.user,
                        password=args.password,
                        user_domain_id='default',
-                       project_id='5f7439af65e44171aa18a205cd90e5b9',
+                       project_id=args.projectid,
                        project_domain_id='Default',
                        project_name=args.project)
     sess = session.Session(auth=auth)
