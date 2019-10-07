@@ -12,6 +12,18 @@ def get_role(client, name):
     found = filter(lambda r: r.name == name, client.roles.list())
     return found[0] if found else None
 
+
+def is_user_assigned(client, project):
+    users = client.users.list(domain='default')
+    found = list()
+    for u in users:
+        if u.name == 'admin':
+            continue
+        if u.default_project_id == project.id:
+            found.append(u)
+    return bool(found)
+
+
 def project_create(client, name):
     new = client.projects.create(name, 'default')
     return new
@@ -62,6 +74,13 @@ def main():
             user = user_exist(admin_client, args.newuser)
             if user:
                 print('User exists {0}'.format(user.name))
+                assigned = is_user_assigned(admin_client, project)
+                if not assigned:
+                    member_role = get_role(admin_client, args.memberrole)
+                    admin_client.roles.grant(member_role, user=user, project=project)
+                    print('User {0} assigned to project {1}'.format(user.name, project.name))
+                else:
+                    print('User {0} already assigned to project {1}'.format(user.name, project.name))
             else:
                 member_role = get_role(admin_client, args.memberrole)
                 newuser = user_create(admin_client, args.newuser, project)
@@ -69,10 +88,16 @@ def main():
                 print('User {0} assigned to project {1}'.format(newuser.name, project.name))
         else:
             newproject = project_create(admin_client, args.newproject)
-            newuser = user_create(admin_client, args.newuser, newproject)
-            member_role = get_role(admin_client, args.memberrole)
-            admin_client.roles.grant(member_role, newuser, newproject)
-            print('User {0} assigned to project {1}'.format(newuser.name, newproject.name))
+            user = user_exist(admin_client, args.newuser)
+            if user:
+                member_role = get_role(admin_client, args.memberrole)
+                admin_client.roles.grant(member_role, user, newproject)
+                print('Existing user {0} assigned to project {1}'.format(user.name, newproject.name))
+            else:
+                newuser = user_create(admin_client, args.newuser, newproject)
+                member_role = get_role(admin_client, args.memberrole)
+                admin_client.roles.grant(member_role, newuser, newproject)
+                print('User {0} assigned to project {1}'.format(newuser.name, newproject.name))
 
 
 main()
