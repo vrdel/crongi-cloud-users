@@ -7,13 +7,26 @@ from keystoneauth1 import session
 
 import argparse
 
+
+def project_create(client, name):
+    new = client.projects.create(name, 'default')
+    return new
+
+
+def user_create(client, name, project):
+    new = client.users.create(name, default_project=project)
+    return new
+
+
 def user_exist(client, user):
     found = filter(lambda u: u.name == user, client.users.list())
     return found[0] if found else None
 
+
 def project_exist(client, project):
     found = filter(lambda p: p.name == project, client.projects.list())
     return found[0] if found else None
+
 
 def main():
     parser = argparse.ArgumentParser(description="crongi-cloud-users client")
@@ -40,9 +53,14 @@ def main():
     if args.newproject:
         project = project_exist(cl, args.newproject)
         if project:
-            print(project.name)
+            print('Project exists {0}'.format(project.name))
             user = user_exist(cl, args.newuser)
             if user:
-                print(user.name)
+                print('User exists {0}'.format(user.name))
+            else:
+                print(user_create(cl, args.newuser, project))
+        else:
+            newproject = project_create(cl, args.newproject)
+            print(user_create(cl, args.newuser, newproject))
 
 main()
