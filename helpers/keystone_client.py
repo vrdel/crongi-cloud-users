@@ -1,54 +1,9 @@
 #!/usr/bin/python
 
 import logging
-from keystoneclient.v3 import client
-from keystoneauth1.identity import v3
-from keystoneauth1 import session
+from crongi_cloud_users.identity import IdentityClient
 
 import argparse
-
-
-def get_role(client, name):
-    found = filter(lambda r: r.name == name, client.roles.list())
-    return found[0] if found else None
-
-
-def is_user_assigned(client, project):
-    users = client.users.list(domain='default')
-    found = list()
-    for u in users:
-        # admin does not have primary project
-        if u.name == 'admin':
-            continue
-        if u.default_project_id == project.id:
-            found.append(u)
-    return bool(found)
-
-
-def user_assigned(client, role, user, project):
-    member_role = get_role(client, role)
-    client.roles.grant(member_role, user=user, project=project)
-    client.users.update(user, default_project=project)
-
-
-def project_create(client, name):
-    new = client.projects.create(name, 'default')
-    return new
-
-
-def user_create(client, name, project):
-    new = client.users.create(name, default_project=project)
-    return new
-
-
-def user_exist(client, user):
-    found = filter(lambda u: u.name == user, client.users.list())
-    return found[0] if found else None
-
-
-def project_exist(client, project):
-    found = filter(lambda p: p.name == project, client.projects.list())
-    return found[0] if found else None
 
 
 def main():
@@ -64,42 +19,39 @@ def main():
     parser.add_argument('--new-project', dest='newproject')
     args = parser.parse_args()
 
-    auth = v3.Password(auth_url=args.url,
-                       username=args.user,
-                       password=args.password,
-                       user_domain_id='default',
-                       project_id=args.projectid,
-                       project_domain_id='Default',
-                       project_name=args.project)
-    sess = session.Session(auth=auth)
-    admin_client = client.Client(session=sess, interface='public')
+    identity_client = IdentityClient(args.user,
+                                     args.password,
+                                     args.project,
+                                     args.projectid,
+                                     args.url,
+                                     args.memberrole)
 
     if args.newproject:
-        project = project_exist(admin_client, args.newproject)
+        project = identity_client.project_exist(args.newproject)
         if project:
             print('Project exists {0}'.format(project.name))
-            user = user_exist(admin_client, args.newuser)
+            user = identity_client.user_exist(args.newuser)
             if user:
                 print('User exists {0}'.format(user.name))
-                assigned = is_user_assigned(admin_client, project)
+                assigned = identity_client.is_user_assigned(project)
                 if not assigned:
-                    user_assigned(admin_client, args.memberrole, user, project)
+                    identity_client.user_assigned(user, project)
                     print('User {0} assigned to project {1}'.format(user.name, project.name))
                 else:
                     print('User {0} already assigned to project {1}'.format(user.name, project.name))
             else:
-                newuser = user_create(admin_client, args.newuser, project)
-                user_assigned(admin_client, args.memberrole, newuser, project)
+                newuser = identity_client.user_create(args.newuser, project)
+                identity_client.user_assigned(newuser, project)
                 print('User {0} assigned to project {1}'.format(newuser.name, project.name))
         else:
-            newproject = project_create(admin_client, args.newproject)
-            user = user_exist(admin_client, args.newuser)
+            newproject = identity_client.project_create(args.newproject)
+            user = identity_client.user_exist(args.newuser)
             if user:
-                user_assigned(admin_client, args.memberrole, user, newproject)
+                identity_client.user_assigned(user, newproject)
                 print('Existing user {0} assigned to project {1}'.format(user.name, newproject.name))
             else:
-                newuser = user_create(admin_client, args.newuser, newproject)
-                user_assigned(admin_client, args.memberrole, newuser, newproject)
+                newuser = identity_client.user_create(args.newuser, newproject)
+                identity_client.user_assigned(newuser, newproject)
                 print('User {0} assigned to project {1}'.format(newuser.name, newproject.name))
 
 
