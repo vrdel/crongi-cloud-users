@@ -59,7 +59,8 @@ def main():
                                      args.url,
                                      args.memberrole)
 
-    update(logger, identity_client, args.newproject, args.newuser)
+    if args.newproject and args.newuser:
+        update(logger, identity_client, args.newproject, args.newuser)
 
     if args.jsonoverride:
         f = JsonOverride(logger, args.jsonoverride)
