@@ -7,35 +7,6 @@ from crongi_cloud_users.external import JsonOverride
 import argparse
 import sys
 
-def update(logger, identity_client, newproject, newuser):
-    project = identity_client.project_exist(newproject)
-    if project:
-        logger.info('Project exists {0}'.format(project.name))
-        user = identity_client.user_exist(newuser)
-        if user:
-            logger.info('User exists {0}'.format(user.name))
-            assigned = identity_client.is_user_assigned(project)
-            if not assigned:
-                identity_client.user_assigned(user, project)
-                logger.info('User {0} assigned to project {1}'.format(user.name, project.name))
-            else:
-                logger.info('User {0} already assigned to project {1}'.format(user.name, project.name))
-        else:
-            newuser = identity_client.user_create(newuser, project)
-            identity_client.user_assigned(newuser, project)
-            logger.info('User {0} assigned to project {1}'.format(newuser.name, project.name))
-    else:
-        newproject = identity_client.project_create(newproject)
-        user = identity_client.user_exist(newuser)
-        if user:
-            identity_client.user_assigned(user, newproject)
-            logger.info('Existing user {0} assigned to project {1}'.format(user.name, newproject.name))
-        else:
-            newuser = identity_client.user_create(newuser, newproject)
-            identity_client.user_assigned(newuser, newproject)
-            logger.info('User {0} assigned to project {1}'.format(newuser.name, newproject.name))
-
-
 def main():
     logger = Logger(sys.argv[0]).get()
 
@@ -52,7 +23,8 @@ def main():
     parser.add_argument('--json-override', dest='jsonoverride')
     args = parser.parse_args()
 
-    identity_client = IdentityClient(args.user,
+    identity_client = IdentityClient(logger,
+                                     args.user,
                                      args.password,
                                      args.project,
                                      args.projectid,
@@ -60,7 +32,7 @@ def main():
                                      args.memberrole)
 
     if args.newproject and args.newuser:
-        update(logger, identity_client, args.newproject, args.newuser)
+        identity_client.update(args.newproject, args.newuser)
 
     if args.jsonoverride:
         f = JsonOverride(logger, args.jsonoverride)
@@ -68,6 +40,6 @@ def main():
         for pr in js:
             project_json = pr['sifra']
             for user_json in pr.get('users'):
-                update(logger, identity_client, project_json, user_json['uid'])
+                identity_client.update(project_json, user_json['uid'])
 
 main()

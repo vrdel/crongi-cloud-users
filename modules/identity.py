@@ -4,8 +4,9 @@ from keystoneauth1 import session
 
 
 class IdentityClient(object):
-    def __init__(self, admin_user, admin_password, admin_project,
+    def __init__(self, logger, admin_user, admin_password, admin_project,
                  admin_project_id, url, member_role):
+        self.logger = logger
         self.admin_user = admin_user
         self.admin_password = admin_password
         self.admin_project = admin_project
@@ -62,3 +63,31 @@ class IdentityClient(object):
         found = filter(lambda p: p.name == project,
                        self.admin_client.projects.list())
         return found[0] if found else None
+
+    def update(self, newproject, newuser):
+        project = self.project_exist(newproject)
+        if project:
+            self.logger.info('Project exists {0}'.format(project.name))
+            user = self.user_exist(newuser)
+            if user:
+                self.logger.info('User exists {0}'.format(user.name))
+                assigned = self.is_user_assigned(project)
+                if not assigned:
+                    self.user_assigned(user, project)
+                    self.logger.info('User {0} assigned to project {1}'.format(user.name, project.name))
+                else:
+                    self.logger.info('User {0} already assigned to project {1}'.format(user.name, project.name))
+            else:
+                newuser = self.user_create(newuser, project)
+                self.user_assigned(newuser, project)
+                self.logger.info('User {0} assigned to project {1}'.format(newuser.name, project.name))
+        else:
+            newproject = self.project_create(newproject)
+            user = self.user_exist(newuser)
+            if user:
+                self.user_assigned(user, newproject)
+                self.logger.info('Existing user {0} assigned to project {1}'.format(user.name, newproject.name))
+            else:
+                newuser = self.user_create(newuser, newproject)
+                self.user_assigned(newuser, newproject)
+                self.logger.info('User {0} assigned to project {1}'.format(newuser.name, newproject.name))
