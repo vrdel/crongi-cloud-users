@@ -18,7 +18,7 @@ class ProjectFeed(object):
             logger.error(e)
 
 
-class JsonOverride(object):
+class JsonExtend(object):
     def __init__(self, logger, jsonfile):
         self. projects = None
 

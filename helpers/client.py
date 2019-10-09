@@ -2,7 +2,7 @@
 
 from crongi_cloud_users.identity import IdentityClient
 from crongi_cloud_users.log import Logger
-from crongi_cloud_users.external import JsonOverride
+from crongi_cloud_users.external import JsonExtend
 
 import argparse
 import sys
@@ -20,7 +20,7 @@ def main():
 
     parser.add_argument('--new-user', dest='newuser')
     parser.add_argument('--new-project', dest='newproject')
-    parser.add_argument('--json-override', dest='jsonoverride')
+    parser.add_argument('--json-extend', dest='jsonextend')
     args = parser.parse_args()
 
     identity_client = IdentityClient(logger,
@@ -34,8 +34,8 @@ def main():
     if args.newproject and args.newuser:
         identity_client.update(args.newproject, args.newuser)
 
-    if args.jsonoverride:
-        f = JsonOverride(logger, args.jsonoverride)
+    if args.jsonextend:
+        f = JsonExtend(logger, args.jsonoverride)
         js = f.get_projects()
         for pr in js:
             project_json = pr['sifra']
