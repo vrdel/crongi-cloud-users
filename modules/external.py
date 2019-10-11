@@ -16,7 +16,7 @@ class ProjectFeed(object):
             logger.error(e)
 
     def get(self):
-        return filter(lambda p: bool(p['htc']), self.projects)
+        return filter(lambda p: bool(p['htc']) and bool(p['status_id']), self.projects)
 
 
 class JsonExtend(object):
