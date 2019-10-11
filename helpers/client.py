@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from crongi_cloud_users.config import parse_config
-from crongi_cloud_users.external import JsonExtend, ProjectFeed
+from crongi_cloud_users.external import JsonProjects, ProjectFeed
 from crongi_cloud_users.identity import IdentityClient
 from crongi_cloud_users.log import Logger
 
@@ -36,18 +36,15 @@ def main():
                                          conf['openstack']['url'],
                                          conf['openstack']['member_role'])
     elif not args.loadconfig:
-        for a in ['user', 'password', 'project', 'projectid', 'url', 'memberrole']:
+        for a in ['user', 'password', 'project', 'projectid', 'url',
+                  'memberrole']:
             if not getattr(args, a, False):
                 logger.error('Missing {}'.format(a))
                 raise SystemExit(1)
 
-        identity_client = IdentityClient(logger,
-                                        args.user,
-                                        args.password,
-                                        args.project,
-                                        args.projectid,
-                                        args.url,
-                                        args.memberrole)
+        identity_client = IdentityClient(logger, args.user, args.password,
+                                         args.project, args.projectid,
+                                         args.url, args.memberrole)
 
     if args.newproject and args.newuser:
         identity_client.update(args.newproject, args.newuser)
@@ -56,7 +53,7 @@ def main():
         projects = ProjectFeed(logger, args.projectsurl, 60).get()
 
     if args.jsonextend:
-        f = JsonExtend(logger, args.jsonoverride)
+        f = JsonProjects(logger, args.jsonoverride)
         js = f.get_projects()
         for pr in js:
             project_json = pr['sifra']

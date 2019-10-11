@@ -1,7 +1,7 @@
 import urlparse
 
 from crongi_cloud_users.config import parse_config
-from crongi_cloud_users.external import JsonExtend
+from crongi_cloud_users.external import JsonProjects
 from crongi_cloud_users.identity import IdentityClient
 from crongi_cloud_users.log import Logger
 

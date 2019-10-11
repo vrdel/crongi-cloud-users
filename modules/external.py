@@ -39,7 +39,7 @@ class ProjectFeed(object):
         return self._interested_fields((self._filtered_projects()))
 
 
-class JsonExtend(object):
+class JsonProjects(object):
     def __init__(self, logger, jsonfile):
         self. projects = None
 
