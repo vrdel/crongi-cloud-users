@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from crongi_cloud_users.config import parse_config
-from crongi_cloud_users.external import JsonExtend
+from crongi_cloud_users.external import JsonExtend, ProjectFeed
 from crongi_cloud_users.identity import IdentityClient
 from crongi_cloud_users.log import Logger
 
@@ -23,6 +23,7 @@ def main():
 
     parser.add_argument('--new-user', dest='newuser')
     parser.add_argument('--new-project', dest='newproject')
+    parser.add_argument('--projects-url', dest='projectsurl')
     parser.add_argument('--json-extend', dest='jsonextend')
     args = parser.parse_args()
 
@@ -50,6 +51,9 @@ def main():
 
     if args.newproject and args.newuser:
         identity_client.update(args.newproject, args.newuser)
+
+    if args.projectsurl:
+        projects = ProjectFeed(logger, args.projectsurl, 60).get()
 
     if args.jsonextend:
         f = JsonExtend(logger, args.jsonoverride)

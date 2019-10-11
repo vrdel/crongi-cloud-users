@@ -7,15 +7,16 @@ class ProjectFeed(object):
         try:
             response = requests.get(url, timeout=timeout, verify=False)
             response.raise_for_status()
-            projects = response.json()
-
-            return response.json()
+            self.projects = response.json()
 
         except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as e:
             logger.error('requests error: %s' % e)
 
         except Exception as e:
             logger.error(e)
+
+    def get(self):
+        return filter(lambda p: bool(p['htc']), self.projects)
 
 
 class JsonExtend(object):
