@@ -17,6 +17,9 @@ def parse_config(logger=None):
                     jsonextend = config.get(section, 'jsonextend').strip()
                     confopts['settings'].update({'jsonextend': jsonextend})
 
+                    default_project = config.get(section, 'default_project').strip()
+                    confopts['settings'].update({'default_project': default_project})
+
                 if section.startswith('openstack'):
                     projectid = config.get(section, 'project_id').strip()
                     confopts['openstack'] = {'project_id': projectid}
