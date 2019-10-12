@@ -31,7 +31,6 @@ WSGI application that assign HTC Cloud CRO-NGI users to Openstack projects
 rm -rf $RPM_BUILD_ROOT
 %{__python} setup.py install --skip-build --root $RPM_BUILD_ROOT --record=INSTALLED_FILES
 install --directory --mode 755 $RPM_BUILD_ROOT/%{_localstatedir}/log/%{name}/
-install --directory --mode 755 $RPM_BUILD_ROOT/%{_localstatedir}/www/
 
 %clean
 rm -rf $RPM_BUILD_ROOT
