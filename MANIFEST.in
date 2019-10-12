@@ -1,0 +1,6 @@
+include config/*
+include modules/*
+include wsgi/*
+include crongi-cloud-users.spec 
+
+recursive-exclude pymodule *.pyc *.pyo
