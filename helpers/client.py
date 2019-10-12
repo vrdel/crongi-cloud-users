@@ -53,7 +53,7 @@ def main():
         projects = ProjectFeed(logger, args.projectsurl, 60).get()
 
     if args.jsonextend:
-        f = JsonProjects(logger, args.jsonoverride)
+        f = JsonProjects(logger, args.jsonextend)
         js = f.get_projects()
         for pr in js:
             project_json = pr['sifra']

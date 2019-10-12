@@ -22,17 +22,25 @@ class ProjectFeed(object):
         return filter(lambda p: bool(p['htc']) and bool(p['status_id']), self.projects)
 
     def _interested_fields(self, projects):
-        projects_trim = dict()
+        projects_trim = list()
+
         for project in projects:
+            project_trim = dict()
+
             projects_users = project['users']
-            projects_trim['users'] = dict()
+            project_trim['users'] = list()
+
             for project_key in project.iterkeys():
                 if project_key in self.interested_project_fields:
-                    projects_trim[project_key] = project[project_key]
+                    project_trim[project_key] = project[project_key]
+
             for project_user in projects_users:
                 for project_user_key in project_user.iterkeys():
                     if project_user_key in self.interested_user_fields:
-                        projects_trim['users'][project_user_key] = project_user[project_user_key]
+                        project_trim['users'].append({project_user_key: project_user[project_user_key]})
+
+            projects_trim.append(project_trim)
+
         return projects_trim
 
     def get(self):
@@ -41,7 +49,7 @@ class ProjectFeed(object):
 
 class JsonProjects(object):
     def __init__(self, logger, jsonfile):
-        self. projects = None
+        self.projects = None
 
         try:
             with open(jsonfile) as fp:
@@ -51,3 +59,4 @@ class JsonProjects(object):
 
     def get_projects(self):
         return self.projects
+
