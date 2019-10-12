@@ -25,6 +25,9 @@ def main():
     parser.add_argument('--new-project', dest='newproject')
     parser.add_argument('--projects-url', dest='projectsurl')
     parser.add_argument('--json-extend', dest='jsonextend')
+
+    parser.add_argument('--find-user', dest='finduser')
+
     args = parser.parse_args()
 
     projects = None
@@ -67,4 +70,9 @@ def main():
                 for user in users:
                     identity_client.update(id, user['uid'])
 
+    if args.finduser:
+        for id, users in projects.iteritems():
+            for user in users:
+                if args.finduser == user['uid']:
+                    print("User {0} found in {1} project".format(args.finduser, id))
 main()
