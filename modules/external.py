@@ -22,7 +22,7 @@ class ProjectFeed(object):
         return filter(lambda p: bool(p['htc']) and bool(p['status_id']), self.projects)
 
     def _interested_fields(self, projects):
-        projects_trim = list()
+        projects_trim = dict()
 
         for project in projects:
             project_trim = dict()
@@ -39,7 +39,7 @@ class ProjectFeed(object):
                     if project_user_key in self.interested_user_fields:
                         project_trim['users'].append({project_user_key: project_user[project_user_key]})
 
-            projects_trim.append(project_trim)
+            projects_trim[project_trim['sifra']] = project_trim['users']
 
         return projects_trim
 
@@ -58,5 +58,9 @@ class JsonProjects(object):
             pass
 
     def get_projects(self):
-        return self.projects
+        projects_d = dict()
 
+        for project in self.projects:
+            projects_d[project['sifra']] = project['users']
+
+        return projects_d
