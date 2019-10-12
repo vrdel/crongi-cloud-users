@@ -27,6 +27,8 @@ def main():
     parser.add_argument('--json-extend', dest='jsonextend')
     args = parser.parse_args()
 
+    projects = None
+
     if args.loadconfig:
         conf = parse_config(logger)
         identity_client = IdentityClient(logger, conf['openstack']['username'],
@@ -55,9 +57,14 @@ def main():
     if args.jsonextend:
         f = JsonProjects(logger, args.jsonextend)
         js = f.get_projects()
-        for pr in js:
-            project_json = pr['sifra']
-            for user_json in pr.get('users'):
-                identity_client.update(project_json, user_json['uid'])
+        if projects and js:
+            projects.update(js)
+            for id, users in projects.iteritems():
+                for user in users:
+                    identity_client.update(id, user['uid'])
+        elif js:
+            for id, users in js:
+                for user in users:
+                    identity_client.update(id, user['uid'])
 
 main()

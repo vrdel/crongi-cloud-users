@@ -1,12 +1,12 @@
 [
     {
-        "sifra": "project-dvrcic-eimamagi",
+        "sifra": "projects-foo",
         "users": [
             {
-                "uid": "dvrcic@srce.hr"
+                "uid": "dvrcic@foo.com"
             },
             {
-                "uid": "eimamagi@srce.hr"
+                "uid": "eimamagi@foo.com"
             }
         ]
     }
