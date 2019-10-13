@@ -21,4 +21,5 @@ setup(name=NAME,
       url='https://github.com/vrdel/crongi-cloud-users',
       package_dir={'crongi_cloud_users': 'modules/'},
       packages=['crongi_cloud_users'],
-      data_files=[('/etc/%s' % NAME, glob.glob('config/*')), ('/var/www/', ['wsgi/crongi-cloud-users.py'])])
+      data_files=[('/etc/%s' % NAME, ['config/cloud-users.conf', 'config/projects.json']),
+                  ('/var/www/', ['wsgi/crongi-cloud-users.py'])])

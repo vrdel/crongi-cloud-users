@@ -38,7 +38,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -f INSTALLED_FILES
 %dir %{_sysconfdir}/%{name}/
 %{python_sitelib}/%{underscore %{name}}/*.pyo
-%dir %{_localstatedir}/log/%{name}/
+%attr(0755,keystone,kolla) %dir %{_localstatedir}/log/%{name}/
 %{_localstatedir}/www/crongi-cloud-users.py[oc]
 
 %changelog
