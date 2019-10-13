@@ -21,11 +21,11 @@ def admin_client():
 
 
 def application(environ, start_response):
-    location = urlparse.parse_qs(environ['QUERY_STRING'])['target']
+    shibboleth_target = urlparse.parse_qs(environ['QUERY_STRING'])['target']
     status = '302 Redirect'
-    output = b'Redirected to {0}'.format(location)
+    output = b'Redirected to {0}'.format(shibboleth_target)
     shibboleth_user = environ['REMOTE_USER']
-    response_headers = [('Location', location[0]),]
+    shibboleth_response_headers = [('Location', shibboleth_target[0]),]
 
     client = admin_client()
     projects = ProjectFeed(logger, conf['settings']['api'], 60).get()
@@ -44,6 +44,6 @@ def application(environ, start_response):
     if not user_found_project:
         client.update(conf['settings']['default_project'], shibboleth_user)
 
-    start_response(status, response_headers)
+    start_response(status, shibboleth_response_headers)
 
     return [output]

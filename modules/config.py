@@ -20,6 +20,9 @@ def parse_config(logger=None):
                     default_project = config.get(section, 'default_project').strip()
                     confopts['settings'].update({'default_project': default_project})
 
+                    redir_unauthz = config.getboolean(section, 'redirect_to_unauthz')
+                    confopts['settings'].update({'redirect_to_unauthz': redir_unauthz})
+
                 if section.startswith('openstack'):
                     projectid = config.get(section, 'project_id').strip()
                     confopts['openstack'] = {'project_id': projectid}
