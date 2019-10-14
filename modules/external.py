@@ -19,7 +19,7 @@ class ProjectFeed(object):
             logger.error(e)
 
     def _filtered_projects(self):
-        return filter(lambda p: bool(p['htc']) and bool(p['status_id']), self.projects)
+        return filter(lambda p: p['htc'] == 1 and p['status_id'] == 1, self.projects)
 
     def _interested_fields(self, projects):
         projects_trim = dict()
@@ -36,7 +36,8 @@ class ProjectFeed(object):
 
             for project_user in projects_users:
                 for project_user_key in project_user.iterkeys():
-                    if project_user_key in self.interested_user_fields:
+                    if (project_user_key in self.interested_user_fields
+                        and project_user['status_id'] == 1):
                         project_trim['users'].append({project_user_key: project_user[project_user_key]})
 
             projects_trim[project_trim['sifra']] = project_trim['users']
