@@ -23,4 +23,4 @@ setup(name=NAME,
       packages=['crongi_cloud_users'],
       data_files=[('/etc/%s' % NAME, ['config/cloud-users.conf', 'config/projects.json']),
                   ('/var/www/', ['wsgi/crongi-cloud-users.py']),
-                  ('/var/www/unauthz/', ['page/logo_srce.gif', 'page/style.css', 'page/unauthz.html'])])
+                  ('/var/www/unauthz/', ['page/logo_srce.gif', 'page/style.css', 'page/index.html'])])
