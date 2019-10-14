@@ -1,0 +1,26 @@
+html {
+	background-color: #ededed;
+}
+
+#wrap {
+	background-color: #ededed;
+}
+
+#content-head {
+	padding-top: 20px;
+}
+
+#content {
+	border-radius: 20px 20px 20px 20px;
+	box-shadow: 0px 0px 1px 1px #e0e0e0;
+	background-color: white;
+	margin: 0 auto;
+	margin-top: 10%;
+	position: relative;
+	width: 600px;
+	text-align: center;
+}
+
+#content-foot {
+	padding-bottom: 50px;
+}
