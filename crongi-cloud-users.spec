@@ -6,7 +6,7 @@
 
 Name:           crongi-cloud-users
 Version:        0.1.2
-Release:        1%{?mydist}.srce
+Release:        2%{?mydist}.srce
 Summary:        WSGI application that assign HTC Cloud CRO-NGI users to Openstack projects 
 Group:          Applications/System
 License:        GPL
@@ -42,6 +42,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_localstatedir}/www/crongi-cloud-users.py[oc]
 
 %changelog
+* Mon Oct 14 2019 Daniel Vrcic <dvrcic@srce.hr> - 0.1.2-2%{?dist}
+- fix parsing of active users and projects
 * Mon Oct 14 2019 Daniel Vrcic <dvrcic@srce.hr> - 0.1.2-1%{?dist}
 - selective redirect to unauthz page 
 * Sat Oct 12 2019 Daniel Vrcic <dvrcic@srce.hr> - 0.1.1-1%{?dist}
