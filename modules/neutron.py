@@ -1,6 +1,5 @@
 import openstack
 
-from neutronclient.v2_0 import client
 from keystoneauth1.identity import v3
 from keystoneauth1 import session
 
