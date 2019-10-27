@@ -13,6 +13,7 @@ class IdentityClient(object):
         self.admin_project_id = admin_project_id
         self.url = url
         self.member_role = member_role
+        self.project_id = None
 
         self.setup_client()
 
@@ -49,11 +50,15 @@ class IdentityClient(object):
 
     def project_create(self, name):
         new = self.admin_client.projects.create(name, 'default')
+        self.project_id = new.id
         return new
 
     def user_create(self, name, project):
         new = self.admin_client.users.create(name, default_project=project)
         return new
+
+    def get_last_projectid(self):
+        return self.project_id
 
     def user_exist(self, user):
         found = filter(lambda u: u.name == user, self.admin_client.users.list())
@@ -62,6 +67,8 @@ class IdentityClient(object):
     def project_exist(self, project):
         found = filter(lambda p: p.name == project,
                        self.admin_client.projects.list())
+        if found:
+            self.project_id = found[0].id
         return found[0] if found else None
 
     def update(self, newproject, newuser):

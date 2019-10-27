@@ -3,6 +3,7 @@
 from crongi_cloud_users.config import parse_config
 from crongi_cloud_users.external import JsonProjects, ProjectFeed
 from crongi_cloud_users.identity import IdentityClient
+from crongi_cloud_users.neutron import NeutronClient
 from crongi_cloud_users.log import Logger
 
 import argparse
@@ -40,6 +41,11 @@ def main():
                                          conf['openstack']['project_id'],
                                          conf['openstack']['url'],
                                          conf['openstack']['member_role'])
+        neutron_client = NeutronClient(logger, conf['openstack']['username'],
+                                       conf['openstack']['password'],
+                                       conf['openstack']['project_name'],
+                                       conf['openstack']['project_id'],
+                                       conf['openstack']['url'])
     elif not args.loadconfig:
         for a in ['user', 'password', 'project', 'projectid', 'url',
                   'memberrole']:
@@ -50,12 +56,16 @@ def main():
         identity_client = IdentityClient(logger, args.user, args.password,
                                          args.project, args.projectid,
                                          args.url, args.memberrole)
+        neutron_client = NeutronClient(logger, args.user, args.password,
+                                       args.project, args.projectid, args.url)
 
-    if args.newproject and args.newuser:
-        identity_client.update(args.newproject, args.newuser)
 
     if args.projectsurl:
         projects = ProjectFeed(logger, args.projectsurl, 60).get()
+
+    if args.newproject and args.newuser:
+        identity_client.update(args.newproject, args.newuser)
+        sec_group = neutron_client.get_securitygroups(project_id=identity_client.get_last_projectid())
 
     if args.jsonextend:
         f = JsonProjects(logger, args.jsonextend)
@@ -65,10 +75,12 @@ def main():
             for id, users in projects.iteritems():
                 for user in users:
                     identity_client.update(id, user['uid'])
+                    sec_group = neutron_client.get_securitygroups(project_id=identity_client.get_last_projectid())
         elif js:
             for id, users in js:
                 for user in users:
                     identity_client.update(id, user['uid'])
+                    sec_group = neutron_client.get_securitygroups(project_id=identity_client.get_last_projectid())
 
     if args.finduser:
         for id, users in projects.iteritems():
