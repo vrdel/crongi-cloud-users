@@ -5,8 +5,8 @@
 %define mydist %{stripc %{dist}}
 
 Name:           crongi-cloud-users
-Version:        0.1.4
-Release:        1%{?mydist}.srce
+Version:        0.1.3
+Release:        2%{?mydist}.srce
 Summary:        WSGI application that assign HTC Cloud CRO-NGI users to Openstack projects 
 Group:          Applications/System
 License:        GPL
@@ -42,7 +42,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_localstatedir}/www/crongi-cloud-users.py[oc]
 
 %changelog
-* Mon Oct 28 2019 Daniel Vrcic <dvrcic@srce.hr> - 0.1.4-1%{?dist}
+* Mon Oct 28 2019 Daniel Vrcic <dvrcic@srce.hr> - 0.1.3-2%{?dist}
 - fix NeutronClient import
 * Mon Oct 28 2019 Daniel Vrcic <dvrcic@srce.hr> - 0.1.3-1%{?dist}
 - create default security rules for new projects
