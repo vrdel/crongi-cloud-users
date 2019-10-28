@@ -3,13 +3,23 @@ import urlparse
 from crongi_cloud_users.config import parse_config
 from crongi_cloud_users.external import JsonProjects, ProjectFeed
 from crongi_cloud_users.identity import IdentityClient
+from crongi_cloud_users.neutron import NeutronClient
 from crongi_cloud_users.log import Logger
 
 logger = Logger('wsgi-crongi-cloud-users').get()
 conf = parse_config(logger)
 
+def neutron_client():
+    neutron_client = NeutronClient(logger, conf['openstack']['username'],
+                                   conf['openstack']['password'],
+                                   conf['openstack']['project_name'],
+                                   conf['openstack']['project_id'],
+                                   conf['openstack']['url'])
 
-def admin_client():
+    return neutron_client
+
+
+def identity_client():
     identity_client = IdentityClient(logger, conf['openstack']['username'],
                                      conf['openstack']['password'],
                                      conf['openstack']['project_name'],
@@ -33,7 +43,8 @@ def application(environ, start_response):
     target, output = None, None
     shibboleth_user = environ['REMOTE_USER']
 
-    client = admin_client()
+    keystone = identity_client()
+    neutron = neutron_client()
     projects = ProjectFeed(logger, conf['settings']['api'], 60).get()
     json_projects = JsonProjects(logger, conf['settings']['jsonextend']).get_projects()
 
@@ -44,12 +55,20 @@ def application(environ, start_response):
     for id, users in projects.iteritems():
         for user in users:
             if shibboleth_user == user['uid']:
-                client.update(id, shibboleth_user)
+                keystone.update(id, shibboleth_user)
+                project_id = keystone.get_last_projectid()
+                sec_group = neutron.get_default_securitygroup(project_id=project_id)
+                if len(sec_group.security_group_rules) < 8:
+                    neutron.create_default_rules(sec_group.id)
                 user_found_project = True
 
     if not user_found_project and not conf['settings']['redirect_to_unauthz']:
         target = urlparse.parse_qs(environ['QUERY_STRING'])['target']
-        client.update(conf['settings']['default_project'], shibboleth_user)
+        keystone.update(conf['settings']['default_project'], shibboleth_user)
+        project_id = keystone.get_last_projectid()
+        sec_group = neutron.get_default_securitygroup(project_id=project_id)
+        if len(sec_group.security_group_rules) < 8:
+            neutron.create_default_rules(sec_group.id)
         output = redirect(start_response, target)
 
     elif user_found_project:

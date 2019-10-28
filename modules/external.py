@@ -19,7 +19,7 @@ class ProjectFeed(object):
             logger.error(e)
 
     def _filtered_projects(self):
-        return filter(lambda p: p['htc'] == 1 and p['status_id'] == 1, self.projects)
+        return filter(lambda p: (p['htc'] == 1 or p['htc'] == 2) and p['status_id'] == 1, self.projects)
 
     def _interested_fields(self, projects):
         projects_trim = dict()

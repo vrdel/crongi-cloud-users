@@ -46,6 +46,7 @@ def main():
         neutron_client = NeutronClient(logger, conf['openstack']['username'],
                                        conf['openstack']['password'],
                                        conf['openstack']['project_name'],
+                                       conf['openstack']['project_id'],
                                        conf['openstack']['url'])
     elif not args.loadconfig:
         for a in ['user', 'password', 'project', 'projectid', 'url',
@@ -58,7 +59,7 @@ def main():
                                          args.project, args.projectid,
                                          args.url, args.memberrole)
         neutron_client = NeutronClient(logger, args.user, args.password,
-                                       args.project, args.url)
+                                       args.project, args.projectid, args.url)
 
     if args.projectsurl:
         projects = ProjectFeed(logger, args.projectsurl, 60).get()
@@ -67,8 +68,9 @@ def main():
         identity_client.update(args.newproject, args.newuser)
         project_id = identity_client.get_last_projectid()
         print(project_id)
-        sec_group = neutron_client.get_default_securitygroups(project_id=project_id)
-        pprint.pprint(sec_group.security_group_rules)
+        sec_group = neutron_client.get_default_securitygroup(project_id=project_id)
+        if len(sec_group.security_group_rules) < 8:
+            neutron_client.create_default_rules(sec_group.id)
 
     if args.jsonextend:
         f = JsonProjects(logger, args.jsonextend)
@@ -80,16 +82,18 @@ def main():
                     identity_client.update(id, user['uid'])
                     project_id = identity_client.get_last_projectid()
                     print(project_id)
-                    sec_group = neutron_client.get_default_securitygroups(project_id=project_id)
-                    ppprint.pprint(sec_group.security_group_rules)
+                    sec_group = neutron_client.get_default_securitygroup(project_id=project_id)
+                    if len(sec_group.security_group_rules) < 8:
+                        neutron_client.create_default_rules(sec_group.id)
         elif js:
             for id, users in js:
                 for user in users:
                     identity_client.update(id, user['uid'])
                     project_id = identity_client.get_last_projectid()
                     print(project_id)
-                    sec_group = neutron_client.get_default_securitygroups(project_id=project_id)
-                    pprint.pprint(sec_group.security_group_rules)
+                    sec_group = neutron_client.get_default_securitygroup(project_id=project_id)
+                    if len(sec_group.security_group_rules) < 8:
+                        neutron_client.create_default_rules(sec_group.id)
 
     if args.finduser:
         for id, users in projects.iteritems():
