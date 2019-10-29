@@ -61,11 +61,15 @@ def main():
         neutron_client = NeutronClient(logger, args.user, args.password,
                                        args.project, args.projectid, args.url)
 
+    project_feed = ProjectFeed(logger, args.projectsurl, 60)
+
     if args.projectsurl:
-        projects = ProjectFeed(logger, args.projectsurl, 60).get()
+        projects = project_feed.get_projects()
+
+    users_lastpr = project_feed.get_userlastprojects()
 
     if args.newproject and args.newuser:
-        identity_client.update(args.newproject, args.newuser)
+        identity_client.update(args.newproject, args.newuser, True)
         project_id = identity_client.get_last_projectid()
         sec_group = neutron_client.get_default_securitygroup(project_id=project_id)
         if len(sec_group.security_group_rules) < 8:
@@ -76,13 +80,16 @@ def main():
         js = f.get_projects()
         if projects and js:
             projects.update(js)
+            p, num_projects = 1, len(projects)
             for id, users in projects.iteritems():
                 for user in users:
-                    identity_client.update(id, user['uid'])
+                    lastpr = users_lastpr[user['uid']]
+                    identity_client.update(id, user['uid'], lastpr == id)
                     project_id = identity_client.get_last_projectid()
                     sec_group = neutron_client.get_default_securitygroup(project_id=project_id)
                     if len(sec_group.security_group_rules) < 8:
                         neutron_client.create_default_rules(sec_group.id)
+                p += 1
         elif js:
             for id, users in js.iteritems():
                 for user in users:

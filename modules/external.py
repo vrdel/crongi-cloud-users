@@ -21,8 +21,8 @@ class ProjectFeed(object):
         except Exception as e:
             logger.error(e)
 
-    def _filtered_projects(self):
-        return filter(lambda p: (p['htc'] == 1 or p['htc'] == 2) and p['status_id'] == 1, self.projects)
+    def _filtered_projects(self, projects):
+        return filter(lambda p: (p['htc'] == 1 or p['htc'] == 2) and p['status_id'] == 1, projects)
 
     def _interested_fields(self, projects):
         projects_unsorted = list()
@@ -52,11 +52,19 @@ class ProjectFeed(object):
     def _sort(self, projects):
         return sorted(projects, key=lambda p: p['date_from'])
 
-    def get(self):
+    def get_projects(self):
         flat = OrderedDict()
-        for d in self._sort(self._interested_fields((self._filtered_projects()))):
+        for d in self._sort(self._interested_fields((self._filtered_projects(self.projects)))):
             flat[d['sifra']] = d['users']
         return flat
+
+    def get_userlastprojects(self):
+        users = dict()
+        projects = self.get_projects()
+        for k, v in projects.iteritems():
+            for u in v:
+                users[u['uid']] = k
+        return users
 
 
 class JsonProjects(object):

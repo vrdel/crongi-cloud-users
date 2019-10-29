@@ -48,6 +48,10 @@ class IdentityClient(object):
         self.project_id = new.id
         return new
 
+    def set_default_project(self, user, project):
+        self.admin_client.users.update(user, default_project=project)
+        self.logger.info('User {0} default project {1}'.format(user.name, project.name))
+
     def user_create(self, name, project):
         new = self.admin_client.users.create(name, default_project=project)
         return new
@@ -66,7 +70,7 @@ class IdentityClient(object):
             self.project_id = found[0].id
         return found[0] if found else None
 
-    def update(self, newproject, newuser):
+    def update(self, newproject, newuser, last_project=False):
         project = self.project_exist(newproject)
         if project:
             self.logger.info('Project exists {0}'.format(project.name))
@@ -79,17 +83,26 @@ class IdentityClient(object):
                     self.logger.info('User {0} assigned to project {1}'.format(user.name, project.name))
                 else:
                     self.logger.info('User {0} already assigned to project {1}'.format(user.name, project.name))
+
+                if last_project:
+                    self.set_default_project(user, project)
             else:
                 newuser = self.user_create(newuser, project)
                 self.user_assigned(newuser, project)
                 self.logger.info('User {0} assigned to project {1}'.format(newuser.name, project.name))
+                if last_project:
+                    self.set_default_project(newuser, project)
         else:
             newproject = self.project_create(newproject)
             user = self.user_exist(newuser)
             if user:
                 self.user_assigned(user, newproject)
                 self.logger.info('Existing user {0} assigned to project {1}'.format(user.name, newproject.name))
+                if last_project:
+                    self.set_default_project(user, newproject)
             else:
                 newuser = self.user_create(newuser, newproject)
                 self.user_assigned(newuser, newproject)
                 self.logger.info('User {0} assigned to project {1}'.format(newuser.name, newproject.name))
+                if last_project:
+                    self.set_default_project(newuser, newproject)
