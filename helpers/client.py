@@ -80,7 +80,6 @@ def main():
         js = f.get_projects()
         if projects and js:
             projects.update(js)
-            p, num_projects = 1, len(projects)
             for id, users in projects.iteritems():
                 for user in users:
                     lastpr = users_lastpr[user['uid']]
@@ -89,7 +88,6 @@ def main():
                     sec_group = neutron_client.get_default_securitygroup(project_id=project_id)
                     if len(sec_group.security_group_rules) < 8:
                         neutron_client.create_default_rules(sec_group.id)
-                p += 1
         elif js:
             for id, users in js.iteritems():
                 for user in users:

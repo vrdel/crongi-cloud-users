@@ -45,8 +45,11 @@ def application(environ, start_response):
 
     keystone = identity_client()
     neutron = neutron_client()
-    projects = ProjectFeed(logger, conf['settings']['api'], 60).get()
+    projects_feed = ProjectFeed(logger, conf['settings']['api'], 60)
     json_projects = JsonProjects(logger, conf['settings']['jsonextend']).get_projects()
+
+    projects = projects_feed.get_projects()
+    users_lastpr = projects_feed.get_userlastprojects()
 
     if projects and json_projects:
         projects.update(json_projects)
@@ -55,7 +58,8 @@ def application(environ, start_response):
     for id, users in projects.iteritems():
         for user in users:
             if shibboleth_user == user['uid']:
-                keystone.update(id, shibboleth_user)
+                lastpr = users_lastpr[user['uid']]
+                keystone.update(id, shibboleth_user, lastpr == id)
                 project_id = keystone.get_last_projectid()
                 sec_group = neutron.get_default_securitygroup(project_id=project_id)
                 if len(sec_group.security_group_rules) < 8:
