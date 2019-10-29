@@ -33,16 +33,9 @@ class IdentityClient(object):
                        self.admin_client.roles.list())
         return found[0] if found else None
 
-    def is_user_assigned(self, project):
-        users = self.admin_client.users.list(domain='default')
-        found = list()
-        for u in users:
-            # admin does not have primary project
-            if u.name == 'admin':
-                continue
-            if u.default_project_id == project.id:
-                found.append(u)
-        return bool(found)
+    def is_user_assigned(self, user, project):
+        return bool(self.admin_client.\
+                    role_assignments.list(project=project.id, user=user.id))
 
     def user_assigned(self, user, project):
         self.admin_client.roles.grant(self.role, user=user, project=project)
@@ -78,7 +71,7 @@ class IdentityClient(object):
             user = self.user_exist(newuser)
             if user:
                 self.logger.info('User exists {0}'.format(user.name))
-                assigned = self.is_user_assigned(project)
+                assigned = self.is_user_assigned(user, project)
                 if not assigned:
                     self.user_assigned(user, project)
                     self.logger.info('User {0} assigned to project {1}'.format(user.name, project.name))

@@ -67,7 +67,6 @@ def main():
     if args.newproject and args.newuser:
         identity_client.update(args.newproject, args.newuser)
         project_id = identity_client.get_last_projectid()
-        print(project_id)
         sec_group = neutron_client.get_default_securitygroup(project_id=project_id)
         if len(sec_group.security_group_rules) < 8:
             neutron_client.create_default_rules(sec_group.id)
@@ -81,16 +80,14 @@ def main():
                 for user in users:
                     identity_client.update(id, user['uid'])
                     project_id = identity_client.get_last_projectid()
-                    print(project_id)
                     sec_group = neutron_client.get_default_securitygroup(project_id=project_id)
                     if len(sec_group.security_group_rules) < 8:
                         neutron_client.create_default_rules(sec_group.id)
         elif js:
-            for id, users in js:
+            for id, users in js.iteritems():
                 for user in users:
                     identity_client.update(id, user['uid'])
                     project_id = identity_client.get_last_projectid()
-                    print(project_id)
                     sec_group = neutron_client.get_default_securitygroup(project_id=project_id)
                     if len(sec_group.security_group_rules) < 8:
                         neutron_client.create_default_rules(sec_group.id)
