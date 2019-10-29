@@ -15,6 +15,7 @@ class NeutronClient(object):
         self.url = url
         self.os_conn = None
         self.neutron_client = None
+        self.project_id = None
 
         self.setup_client()
 
@@ -27,12 +28,14 @@ class NeutronClient(object):
                            project_name=self.admin_project)
         sess = session.Session(auth=auth)
         os_conn = connection.Connection(session=sess,
+                                        region_name='RegionOne',
                                         identity_interface='public')
         self.os_conn = os_conn
         self.neutron_client = os_conn.network
 
     def get_default_securitygroup(self, project_id=None):
         if project_id:
+            self.project_id = project_id
             return self.neutron_client.find_security_group('default', project_id=project_id)
         else:
             return self.os_conn.list_security_groups()
@@ -40,6 +43,7 @@ class NeutronClient(object):
     def create_default_rules(self, security_group_id):
         rule = self.neutron_client.create_security_group_rule(
             security_group_id=security_group_id,
+            project_id=self.project_id,
             direction='ingress',
             remote_ip_prefix='0.0.0.0/0',
             protocol='tcp',
@@ -49,6 +53,7 @@ class NeutronClient(object):
         )
         rule = self.neutron_client.create_security_group_rule(
             security_group_id=security_group_id,
+            project_id=self.project_id,
             direction='ingress',
             remote_ip_prefix='0.0.0.0/0',
             protocol='tcp',
@@ -58,6 +63,7 @@ class NeutronClient(object):
         )
         rule = self.neutron_client.create_security_group_rule(
             security_group_id=security_group_id,
+            project_id=self.project_id,
             direction='ingress',
             remote_ip_prefix='0.0.0.0/0',
             protocol='icmp',
@@ -65,6 +71,7 @@ class NeutronClient(object):
         )
         rule = self.neutron_client.create_security_group_rule(
             security_group_id=security_group_id,
+            project_id=self.project_id,
             direction='ingress',
             remote_ip_prefix='0.0.0.0/0',
             protocol='tcp',
@@ -74,6 +81,7 @@ class NeutronClient(object):
         )
         rule = self.neutron_client.create_security_group_rule(
             security_group_id=security_group_id,
+            project_id=self.project_id,
             direction='ingress',
             remote_ip_prefix='0.0.0.0/0',
             protocol='tcp',
@@ -83,6 +91,7 @@ class NeutronClient(object):
         )
         rule = self.neutron_client.create_security_group_rule(
             security_group_id=security_group_id,
+            project_id=self.project_id,
             direction='ingress',
             remote_ip_prefix='0.0.0.0/0',
             protocol='tcp',
@@ -92,6 +101,7 @@ class NeutronClient(object):
         )
         rule = self.neutron_client.create_security_group_rule(
             security_group_id=security_group_id,
+            project_id=self.project_id,
             direction='ingress',
             remote_ip_prefix='0.0.0.0/0',
             protocol='tcp',
@@ -101,6 +111,7 @@ class NeutronClient(object):
         )
         rule = self.neutron_client.create_security_group_rule(
             security_group_id=security_group_id,
+            project_id=self.project_id,
             direction='ingress',
             remote_ip_prefix='0.0.0.0/0',
             protocol='tcp',
