@@ -1,10 +1,13 @@
+from collections import OrderedDict
+from datetime import datetime
+
 import requests
 import json
 
 
 class ProjectFeed(object):
     interested_user_fields = ['uid']
-    interested_project_fields = ['sifra']
+    interested_project_fields = ['sifra', 'date_from']
 
     def __init__(self, logger, url, timeout):
         try:
@@ -22,7 +25,7 @@ class ProjectFeed(object):
         return filter(lambda p: (p['htc'] == 1 or p['htc'] == 2) and p['status_id'] == 1, self.projects)
 
     def _interested_fields(self, projects):
-        projects_trim = dict()
+        projects_unsorted = list()
 
         for project in projects:
             project_trim = dict()
@@ -40,12 +43,20 @@ class ProjectFeed(object):
                         and project_user['status_id'] == 1):
                         project_trim['users'].append({project_user_key: project_user[project_user_key]})
 
-            projects_trim[project_trim['sifra']] = project_trim['users']
+            project_trim['date_from'] = datetime.strptime(project_trim['date_from'], '%Y-%m-%d')
 
-        return projects_trim
+            projects_unsorted.append(project_trim)
+
+        return projects_unsorted
+
+    def _sort(self, projects):
+        return sorted(projects, key=lambda p: p['date_from'])
 
     def get(self):
-        return self._interested_fields((self._filtered_projects()))
+        flat = OrderedDict()
+        for d in self._sort(self._interested_fields((self._filtered_projects()))):
+            flat[d['sifra']] = d['users']
+        return flat
 
 
 class JsonProjects(object):

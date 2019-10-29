@@ -35,7 +35,9 @@ class IdentityClient(object):
 
     def is_user_assigned(self, user, project):
         return bool(self.admin_client.\
-                    role_assignments.list(project=project.id, user=user.id))
+                    role_assignments.list(project=project.id,
+                                          user=user.id,
+                                          role=self.role))
 
     def user_assigned(self, user, project):
         self.admin_client.roles.grant(self.role, user=user, project=project)
