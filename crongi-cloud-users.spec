@@ -5,8 +5,8 @@
 %define mydist %{stripc %{dist}}
 
 Name:           crongi-cloud-users
-Version:        0.1.3
-Release:        3%{?mydist}.srce
+Version:        0.1.4
+Release:        1%{?mydist}.srce
 Summary:        WSGI application that assign HTC Cloud CRO-NGI users to Openstack projects 
 Group:          Applications/System
 License:        GPL
@@ -42,6 +42,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_localstatedir}/www/crongi-cloud-users.py[oc]
 
 %changelog
+* Tue Oct 29 2019 Daniel Vrcic <dvrcic@srce.hr> - 0.1.4-1%{?dist}
+- fix associations of users with multiple projects
+- last submitted project for user is default_project
+- explicit project_id for default security group rules
 * Tue Oct 29 2019 Daniel Vrcic <dvrcic@srce.hr> - 0.1.3-3%{?dist}
 - add slipped neutron module changes 
 * Mon Oct 28 2019 Daniel Vrcic <dvrcic@srce.hr> - 0.1.3-2%{?dist}
