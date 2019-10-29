@@ -6,7 +6,7 @@
 
 Name:           crongi-cloud-users
 Version:        0.1.3
-Release:        2%{?mydist}.srce
+Release:        3%{?mydist}.srce
 Summary:        WSGI application that assign HTC Cloud CRO-NGI users to Openstack projects 
 Group:          Applications/System
 License:        GPL
@@ -42,6 +42,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_localstatedir}/www/crongi-cloud-users.py[oc]
 
 %changelog
+* Tue Oct 29 2019 Daniel Vrcic <dvrcic@srce.hr> - 0.1.3-3%{?dist}
+- add slipped neutron module changes 
 * Mon Oct 28 2019 Daniel Vrcic <dvrcic@srce.hr> - 0.1.3-2%{?dist}
 - fix NeutronClient import
 * Mon Oct 28 2019 Daniel Vrcic <dvrcic@srce.hr> - 0.1.3-1%{?dist}
